@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automação Escolar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-in-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl font-bold text-primary-800 mb-2">Automação Escolar</h1>
+            <p class="text-gray-600">Gerencie alunos, notas e pesquisas de forma automatizada</p>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - List Students -->
+            <div class="lg:col-span-1 space-y-8">
+                <!-- List Students Card -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">Lista de Alunos</h2>
+                            <button id="listStudentsBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors duration-300 flex items-center">
+                                <i class="fas fa-sync-alt mr-2"></i> Carregar
+                            </button>
+                        </div>
+                        
+                        <div class="relative">
+                            <div id="studentsLoading" class="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center hidden">
+                                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
+                            </div>
+                            
+                            <div id="studentsListContainer" class="max-h-96 overflow-y-auto">
+                                <table id="studentsTable" class="w-full divide-y divide-gray-200 hidden">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aluno</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentsTableBody" class="bg-white divide-y divide-gray-200">
+                                        <!-- Students will be inserted here -->
+                                    </tbody>
+                                </table>
+                                
+                                <div id="noStudentsMessage" class="text-center py-8 text-gray-500">
+                                    <i class="fas fa-users-slash text-3xl mb-2"></i>
+                                    <p>Nenhum aluno carregado. Clique em "Carregar" para listar os alunos.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Forms -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Add Student Card -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Cadastrar Novo Aluno</h2>
+                        
+                        <form id="addStudentForm" class="space-y-4">
+                            <div>
+                                <label for="studentName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Aluno</label>
+                                <input type="text" id="studentName" name="studentName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                            </div>
+                            
+                            <div>
+                                <label for="parentName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Responsável</label>
+                                <input type="text" id="parentName" name="parentName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                            </div>
+                            
+                            <div>
+                                <label for="parentPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone do Responsável</label>
+                                <input type="tel" id="parentPhone" name="parentPhone" required pattern="[0-9]{13}" placeholder="5512991451258" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                                <p class="mt-1 text-xs text-gray-500">Formato: 5512991451258 (sem + ou outros caracteres)</p>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                                <i class="fas fa-user-plus mr-2"></i> Cadastrar Aluno
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Add Grade Card -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Inserir Nota</h2>
+                        
+                        <form id="addGradeForm" class="space-y-4">
+                            <div>
+                                <label for="studentSelect" class="block text-sm font-medium text-gray-700 mb-1">Aluno</label>
+                                <select id="studentSelect" name="studentId" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                                    <option value="" disabled selected>Selecione um aluno</option>
+                                    <!-- Students will be inserted here -->
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Matéria</label>
+                                <input type="text" id="subject" name="subject" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="grade" class="block text-sm font-medium text-gray-700 mb-1">Nota (0-10)</label>
+                                    <input type="text" id="grade" name="grade" pattern="[0-9],[0-9]|[0-9]" placeholder="8,2" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                                    <p class="mt-1 text-xs text-gray-500">Formato: 8,2 (use vírgula como separador decimal)</p>
+                                </div>
+                                
+                                <div>
+                                    <label for="gradeDate" class="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                                    <input type="date" id="gradeDate" name="gradeDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                                <i class="fas fa-edit mr-2"></i> Inserir Nota
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Add Survey Card -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Enviar Pesquisa</h2>
+                        
+                        <form id="addSurveyForm" class="space-y-4">
+                            <div>
+                                <label for="surveyQuestion" class="block text-sm font-medium text-gray-700 mb-1">Pergunta da Pesquisa</label>
+                                <textarea id="surveyQuestion" name="surveyQuestion" rows="3" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300" placeholder="Como você avalia nossa escola? Responda de 1 a 5."></textarea>
+                            </div>
+                            
+                            <div>
+                                <label for="surveyDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Envio</label>
+                                <input type="date" id="surveyDate" name="surveyDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-secondary-500 hover:bg-secondary-600 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                                <i class="fas fa-paper-plane mr-2"></i> Enviar Pesquisa
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Notification Area -->
+        <div id="notificationArea" class="fixed bottom-4 right-4 space-y-2 w-80 z-50"></div>
+    </div>
+    
+    <script>
+        // Base URL for API endpoints
+        const API_BASE_URL = 'https://n8n.2bx.com.br/webhook';
+        
+        // DOM Elements
+        const listStudentsBtn = document.getElementById('listStudentsBtn');
+        const studentsTable = document.getElementById('studentsTable');
+        const studentsTableBody = document.getElementById('studentsTableBody');
+        const noStudentsMessage = document.getElementById('noStudentsMessage');
+        const studentsLoading = document.getElementById('studentsLoading');
+        const studentSelect = document.getElementById('studentSelect');
+        const addStudentForm = document.getElementById('addStudentForm');
+        const addGradeForm = document.getElementById('addGradeForm');
+        const addSurveyForm = document.getElementById('addSurveyForm');
+        const notificationArea = document.getElementById('notificationArea');
+        
+        // Current date for default date inputs
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('gradeDate').value = today;
+        document.getElementById('surveyDate').value = today;
+        
+        // Show notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `p-4 rounded-lg shadow-lg fade-in ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            notification.innerHTML = `
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        ${type === 'success' ? 
+                          '<i class="fas fa-check-circle text-green-500"></i>' : 
+                          '<i class="fas fa-exclamation-circle text-red-500"></i>'}
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-4 text-gray-500 hover:text-gray-700 focus:outline-none" onclick="this.parentElement.parentElement.classList.add('fade-out'); setTimeout(() => this.parentElement.parentElement.remove(), 300)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            notificationArea.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+        
+        // Load students from API
+        async function loadStudents() {
+            try {
+                studentsLoading.classList.remove('hidden');
+                listStudentsBtn.disabled = true;
+                
+                const response = await fetch(`${API_BASE_URL}/listar/alunos`);
+                const students = await response.json();
+                
+                // Clear previous data
+                studentsTableBody.innerHTML = '';
+                studentSelect.innerHTML = '<option value="" disabled selected>Selecione um aluno</option>';
+                
+                if (students.length > 0) {
+                    studentsTable.classList.remove('hidden');
+                    noStudentsMessage.classList.add('hidden');
+                    
+                    students.forEach(student => {
+                        // Add to table
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">${student.nome_aluno}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-500">${student.nome_pai}</div>
+                                <div class="text-xs text-gray-400">${student.telefone_pai}</div>
+                            </td>
+                        `;
+                        studentsTableBody.appendChild(row);
+                        
+                        // Add to select
+                        const option = document.createElement('option');
+                        option.value = student.id;
+                        option.textContent = `${student.nome_aluno} (${student.nome_pai})`;
+                        studentSelect.appendChild(option);
+                    });
+                } else {
+                    studentsTable.classList.add('hidden');
+                    noStudentsMessage.classList.remove('hidden');
+                }
+                
+                showNotification('Lista de alunos atualizada com sucesso!');
+            } catch (error) {
+                console.error('Error loading students:', error);
+                showNotification('Erro ao carregar alunos. Tente novamente.', 'error');
+            } finally {
+                studentsLoading.classList.add('hidden');
+                listStudentsBtn.disabled = false;
+            }
+        }
+        
+        // Add new student
+        async function addStudent(studentData) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/inserir/aluno`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        nome_aluno: studentData.studentName,
+                        nome_pai: studentData.parentName,
+                        telefone_pai: studentData.parentPhone
+                    })
+                });
+                
+                const result = await response.json();
+                showNotification(result.Resposta || 'Aluno cadastrado com sucesso!');
+                
+                // Reload students list
+                loadStudents();
+                
+                // Clear form
+                addStudentForm.reset();
+            } catch (error) {
+                console.error('Error adding student:', error);
+                showNotification('Erro ao cadastrar aluno. Verifique os dados e tente novamente.', 'error');
+            }
+        }
+        
+        // Add grade for student
+        async function addGrade(gradeData) {
+            try {
+                // Convert comma to dot for decimal notation
+                const gradeValue = gradeData.grade.replace(',', '.');
+                
+                const response = await fetch(`${API_BASE_URL}/inserir/nota`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        aluno_id: parseInt(gradeData.studentId),
+                        materia: gradeData.subject,
+                        nota: parseFloat(gradeValue),
+                        data: gradeData.gradeDate
+                    })
+                });
+                
+                const result = await response.json();
+                showNotification(result.Resposta || 'Nota cadastrada com sucesso!');
+                
+                // Clear form
+                addGradeForm.reset();
+                document.getElementById('gradeDate').value = today;
+            } catch (error) {
+                console.error('Error adding grade:', error);
+                showNotification('Erro ao cadastrar nota. Verifique os dados e tente novamente.', 'error');
+            }
+        }
+
+        // Add survey
+        async function addSurvey(surveyData) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/inserir/pesquisa`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pergunta: surveyData.surveyQuestion,
+                        data_envio: surveyData.surveyDate
+                    })
+                });
+                
+                const result = await response.json();
+                showNotification(result.Resposta || 'Pesquisa enviada com sucesso!');
+                
+                // Clear form
+                addSurveyForm.reset();
+                document.getElementById('surveyDate').value = today;
+            } catch (error) {
+                console.error('Error adding survey:', error);
+                showNotification('Erro ao enviar pesquisa. Tente novamente.', 'error');
+            }
+        }
+        
+        // Event Listeners
+        listStudentsBtn.addEventListener('click', loadStudents);
+        
+        addStudentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const studentName = document.getElementById('studentName').value.trim();
+            const parentName = document.getElementById('parentName').value.trim();
+            const parentPhone = document.getElementById('parentPhone').value.trim();
+            
+            if (!studentName || !parentName || !parentPhone) {
+                showNotification('Preencha todos os campos obrigatórios.', 'error');
+                return;
+            }
+            
+            if (!/^\d{13}$/.test(parentPhone)) {
+                showNotification('O telefone deve conter 13 dígitos (55 + DDD + número).', 'error');
+                return;
+            }
+            
+            addStudent({
+                studentName,
+                parentName,
+                parentPhone
+            });
+        });
+        
+        addGradeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('studentSelect').value;
+            const subject = document.getElementById('subject').value.trim();
+            const grade = document.getElementById('grade').value.trim();
+            const gradeDate = document.getElementById('gradeDate').value;
+            
+            if (!studentId || !subject || !grade || !gradeDate) {
+                showNotification('Preencha todos os campos obrigatórios.', 'error');
+                return;
+            }
+            
+            if (!/^\d{1},\d{1}$|^\d{1}$/.test(grade)) {
+                showNotification('A nota deve estar no formato 8,2 (use vírgula como separador decimal).', 'error');
+                return;
+            }
+            
+            const gradeValue = parseFloat(grade.replace(',', '.'));
+            if (gradeValue < 0 || gradeValue > 10) {
+                showNotification('A nota deve estar entre 0 e 10.', 'error');
+                return;
+            }
+            
+            addGrade({
+                studentId,
+                subject,
+                grade,
+                gradeDate
+            });
+        });
+
+        addSurveyForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const surveyQuestion = document.getElementById('surveyQuestion').value.trim();
+            const surveyDate = document.getElementById('surveyDate').value;
+            
+            if (!surveyQuestion || !surveyDate) {
+                showNotification('Preencha todos os campos obrigatórios.', 'error');
+                return;
+            }
+            
+            addSurvey({
+                surveyQuestion,
+                surveyDate
+            });
+        });
+        
+        // Initial load
+        loadStudents();
+    </script>
+</body>
+</html>
