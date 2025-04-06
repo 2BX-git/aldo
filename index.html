@@ -22,18 +22,6 @@
                             700: '#0369a1',
                             800: '#075985',
                             900: '#0c4a6e',
-                        },
-                        secondary: {
-                            50: '#f5f3ff',
-                            100: '#ede9fe',
-                            200: '#ddd6fe',
-                            300: '#c4b5fd',
-                            400: '#a78bfa',
-                            500: '#8b5cf6',
-                            600: '#7c3aed',
-                            700: '#6d28d9',
-                            800: '#5b21b6',
-                            900: '#4c1d95',
                         }
                     }
                 }
@@ -58,15 +46,6 @@
             from { opacity: 1; transform: translateY(0); }
             to { opacity: 0; transform: translateY(10px); }
         }
-        
-        .slide-in {
-            animation: slideIn 0.3s ease-in-out;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans">
@@ -86,7 +65,7 @@
                     <div class="p-6">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="text-xl font-semibold text-gray-800">Lista de Alunos</h2>
-                            <button id="listStudentsBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors duration-300 flex items-center">
+                            <button id="listStudentsBtn" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors duration-300 flex items-center">
                                 <i class="fas fa-sync-alt mr-2"></i> Carregar
                             </button>
                         </div>
@@ -117,6 +96,58 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Survey Responses Card -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Respostas da Pesquisa</h2>
+                        
+                        <div class="mb-4">
+                            <label for="surveySelect" class="block text-sm font-medium text-gray-700 mb-1">Selecione a Pesquisa</label>
+                            <select id="surveySelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                                <option value="" disabled selected>Carregando pesquisas...</option>
+                            </select>
+                        </div>
+
+                        <div class="relative">
+                            <div id="responsesLoading" class="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center hidden">
+                                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
+                            </div>
+
+                            <div id="responsesContainer" class="hidden">
+                                <h3 class="font-medium text-gray-900 mb-2" id="surveyQuestionText"></h3>
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <div class="grid grid-cols-2 gap-4 mb-4">
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-primary-600" id="totalResponses">0</div>
+                                            <div class="text-sm text-gray-500">Total de respostas</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-primary-600" id="averageRating">0</div>
+                                            <div class="text-sm text-gray-500">Média das notas</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-3" id="ratingDistribution">
+                                        <!-- Rating bars will be inserted here -->
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <h4 class="font-medium text-gray-900 mb-2">Últimas respostas:</h4>
+                                    <div class="space-y-3" id="latestResponses">
+                                        <!-- Latest responses will be inserted here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="noResponsesMessage" class="text-center py-8 text-gray-500">
+                                <i class="fas fa-comment-slash text-3xl mb-2"></i>
+                                <p>Selecione uma pesquisa para ver as respostas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Right Column - Forms -->
@@ -143,7 +174,7 @@
                                 <p class="mt-1 text-xs text-gray-500">Formato: 5512991451258 (sem + ou outros caracteres)</p>
                             </div>
                             
-                            <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                            <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
                                 <i class="fas fa-user-plus mr-2"></i> Cadastrar Aluno
                             </button>
                         </form>
@@ -182,7 +213,7 @@
                                 </div>
                             </div>
                             
-                            <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                            <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
                                 <i class="fas fa-edit mr-2"></i> Inserir Nota
                             </button>
                         </form>
@@ -205,7 +236,7 @@
                                 <input type="date" id="surveyDate" name="surveyDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
                             </div>
                             
-                            <button type="submit" class="w-full bg-secondary-500 hover:bg-secondary-600 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                            <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
                                 <i class="fas fa-paper-plane mr-2"></i> Enviar Pesquisa
                             </button>
                         </form>
@@ -232,6 +263,15 @@
         const addStudentForm = document.getElementById('addStudentForm');
         const addGradeForm = document.getElementById('addGradeForm');
         const addSurveyForm = document.getElementById('addSurveyForm');
+        const surveySelect = document.getElementById('surveySelect');
+        const responsesContainer = document.getElementById('responsesContainer');
+        const noResponsesMessage = document.getElementById('noResponsesMessage');
+        const responsesLoading = document.getElementById('responsesLoading');
+        const surveyQuestionText = document.getElementById('surveyQuestionText');
+        const totalResponses = document.getElementById('totalResponses');
+        const averageRating = document.getElementById('averageRating');
+        const ratingDistribution = document.getElementById('ratingDistribution');
+        const latestResponses = document.getElementById('latestResponses');
         const notificationArea = document.getElementById('notificationArea');
         
         // Current date for default date inputs
@@ -321,6 +361,103 @@
             }
         }
         
+        // Load surveys from API
+        async function loadSurveys() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/lista/pesquisas`);
+                const surveys = await response.json();
+                
+                surveySelect.innerHTML = '<option value="" disabled selected>Selecione uma pesquisa</option>';
+                
+                if (surveys.length > 0) {
+                    surveys.forEach(survey => {
+                        const option = document.createElement('option');
+                        option.value = survey.id;
+                        option.textContent = `${survey.pergunta} (${survey.data_envio})`;
+                        surveySelect.appendChild(option);
+                    });
+                } else {
+                    surveySelect.innerHTML = '<option value="" disabled selected>Nenhuma pesquisa disponível</option>';
+                }
+            } catch (error) {
+                console.error('Error loading surveys:', error);
+                showNotification('Erro ao carregar pesquisas. Tente novamente.', 'error');
+            }
+        }
+        
+        // Load survey responses from API
+        async function loadSurveyResponses(surveyId) {
+            try {
+                responsesLoading.classList.remove('hidden');
+                noResponsesMessage.classList.add('hidden');
+                responsesContainer.classList.add('hidden');
+                
+                const response = await fetch(`${API_BASE_URL}/lista/respostas?pesquisa_id=${surveyId}`);
+                const data = await response.json();
+                
+                if (data.respostas && data.respostas.length > 0) {
+                    // Update question text
+                    surveyQuestionText.textContent = data.pergunta;
+                    
+                    // Calculate stats
+                    const total = data.respostas.length;
+                    const sum = data.respostas.reduce((acc, curr) => acc + parseInt(curr.resposta), 0);
+                    const average = (sum / total).toFixed(1);
+                    
+                    // Update stats
+                    totalResponses.textContent = total;
+                    averageRating.textContent = average;
+                    
+                    // Calculate rating distribution
+                    const ratingCounts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+                    data.respostas.forEach(r => ratingCounts[r.resposta]++);
+                    
+                    // Update rating distribution bars
+                    ratingDistribution.innerHTML = '';
+                    for (let i = 5; i >= 1; i--) {
+                        const percentage = (ratingCounts[i] / total) * 100;
+                        ratingDistribution.innerHTML += `
+                            <div class="flex items-center">
+                                <div class="w-8 text-right mr-2">${i} ★</div>
+                                <div class="flex-1 bg-gray-200 rounded-full h-4">
+                                    <div class="bg-primary-600 h-4 rounded-full" style="width: ${percentage}%"></div>
+                                </div>
+                                <div class="w-8 text-left ml-2 text-sm text-gray-600">${ratingCounts[i]}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Show latest responses
+                    latestResponses.innerHTML = '';
+                    const latest = data.respostas.slice(0, 5);
+                    latest.forEach(response => {
+                        latestResponses.innerHTML += `
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 text-primary-600">${response.resposta} ★</div>
+                                <div class="ml-3">
+                                    <div class="text-sm text-gray-900">${response.nome_aluno || 'Anônimo'}</div>
+                                    <div class="text-xs text-gray-500">${new Date(response.data_resposta).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    responsesContainer.classList.remove('hidden');
+                } else {
+                    noResponsesMessage.classList.remove('hidden');
+                    noResponsesMessage.innerHTML = `
+                        <i class="fas fa-comment-slash text-3xl mb-2"></i>
+                        <p>Nenhuma resposta encontrada para esta pesquisa.</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading survey responses:', error);
+                showNotification('Erro ao carregar respostas. Tente novamente.', 'error');
+            } finally {
+                responsesLoading.classList.add('hidden');
+            }
+        }
+        
         // Add new student
         async function addStudent(studentData) {
             try {
@@ -398,9 +535,10 @@
                 const result = await response.json();
                 showNotification(result.Resposta || 'Pesquisa enviada com sucesso!');
                 
-                // Clear form
+                // Clear form and reload surveys
                 addSurveyForm.reset();
                 document.getElementById('surveyDate').value = today;
+                loadSurveys();
             } catch (error) {
                 console.error('Error adding survey:', error);
                 showNotification('Erro ao enviar pesquisa. Tente novamente.', 'error');
@@ -482,9 +620,19 @@
                 surveyDate
             });
         });
+
+        surveySelect.addEventListener('change', (e) => {
+            if (e.target.value) {
+                loadSurveyResponses(e.target.value);
+            } else {
+                noResponsesMessage.classList.remove('hidden');
+                responsesContainer.classList.add('hidden');
+            }
+        });
         
         // Initial load
         loadStudents();
+        loadSurveys();
     </script>
 </body>
 </html>
