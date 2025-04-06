@@ -116,27 +116,22 @@
 
                             <div id="responsesContainer" class="hidden">
                                 <h3 class="font-medium text-gray-900 mb-2" id="surveyQuestionText"></h3>
-                                <div class="bg-gray-100 p-4 rounded-lg">
-                                    <div class="grid grid-cols-2 gap-4 mb-4">
-                                        <div class="text-center">
-                                            <div class="text-2xl font-bold text-primary-600" id="totalResponses">0</div>
-                                            <div class="text-sm text-gray-500">Total de respostas</div>
-                                        </div>
-                                        <div class="text-center">
-                                            <div class="text-2xl font-bold text-primary-600" id="averageRating">0</div>
-                                            <div class="text-sm text-gray-500">Média das notas</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="space-y-3" id="ratingDistribution">
-                                        <!-- Rating bars will be inserted here -->
-                                    </div>
-                                </div>
-
+                                
                                 <div class="mt-4">
-                                    <h4 class="font-medium text-gray-900 mb-2">Últimas respostas:</h4>
-                                    <div class="space-y-3" id="latestResponses">
-                                        <!-- Latest responses will be inserted here -->
+                                    <h4 class="font-medium text-gray-900 mb-2">Respostas:</h4>
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aluno ID</th>
+                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resposta</th>
+                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="responsesTableBody" class="bg-white divide-y divide-gray-200">
+                                                <!-- Responses will be inserted here -->
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -268,10 +263,7 @@
         const noResponsesMessage = document.getElementById('noResponsesMessage');
         const responsesLoading = document.getElementById('responsesLoading');
         const surveyQuestionText = document.getElementById('surveyQuestionText');
-        const totalResponses = document.getElementById('totalResponses');
-        const averageRating = document.getElementById('averageRating');
-        const ratingDistribution = document.getElementById('ratingDistribution');
-        const latestResponses = document.getElementById('latestResponses');
+        const responsesTableBody = document.getElementById('responsesTableBody');
         const notificationArea = document.getElementById('notificationArea');
         
         // Current date for default date inputs
@@ -393,53 +385,32 @@
                 responsesContainer.classList.add('hidden');
                 
                 const response = await fetch(`${API_BASE_URL}/lista/respostas?pesquisa_id=${surveyId}`);
-                const data = await response.json();
+                const responses = await response.json();
                 
-                if (data.respostas && data.respostas.length > 0) {
-                    // Update question text
-                    surveyQuestionText.textContent = data.pergunta;
+                if (responses.length > 0) {
+                    // Update question text (we don't have the question in the response, so we get it from the select)
+                    const selectedSurvey = surveySelect.options[surveySelect.selectedIndex].text;
+                    surveyQuestionText.textContent = selectedSurvey.split('(')[0].trim();
                     
-                    // Calculate stats
-                    const total = data.respostas.length;
-                    const sum = data.respostas.reduce((acc, curr) => acc + parseInt(curr.resposta), 0);
-                    const average = (sum / total).toFixed(1);
+                    // Clear previous responses
+                    responsesTableBody.innerHTML = '';
                     
-                    // Update stats
-                    totalResponses.textContent = total;
-                    averageRating.textContent = average;
-                    
-                    // Calculate rating distribution
-                    const ratingCounts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
-                    data.respostas.forEach(r => ratingCounts[r.resposta]++);
-                    
-                    // Update rating distribution bars
-                    ratingDistribution.innerHTML = '';
-                    for (let i = 5; i >= 1; i--) {
-                        const percentage = (ratingCounts[i] / total) * 100;
-                        ratingDistribution.innerHTML += `
-                            <div class="flex items-center">
-                                <div class="w-8 text-right mr-2">${i} ★</div>
-                                <div class="flex-1 bg-gray-200 rounded-full h-4">
-                                    <div class="bg-primary-600 h-4 rounded-full" style="width: ${percentage}%"></div>
-                                </div>
-                                <div class="w-8 text-left ml-2 text-sm text-gray-600">${ratingCounts[i]}</div>
-                            </div>
+                    // Add responses to table
+                    responses.forEach(response => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                ${response.aluno_id}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                ${response.resposta}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                ${new Date(response.data_resposta).toLocaleDateString()}
+                            </td>
                         `;
-                    }
-                    
-                    // Show latest responses
-                    latestResponses.innerHTML = '';
-                    const latest = data.respostas.slice(0, 5);
-                    latest.forEach(response => {
-                        latestResponses.innerHTML += `
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0 text-primary-600">${response.resposta} ★</div>
-                                <div class="ml-3">
-                                    <div class="text-sm text-gray-900">${response.nome_aluno || 'Anônimo'}</div>
-                                    <div class="text-xs text-gray-500">${new Date(response.data_resposta).toLocaleDateString()}</div>
-                                </div>
-                            </div>
-                        `;
+                        responsesTableBody.appendChild(row);
                     });
                     
                     responsesContainer.classList.remove('hidden');
