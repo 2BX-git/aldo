@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Automação Escolar</title>
+    <title>Projeto Mãe Coruja</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -61,6 +61,15 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
+        
+        .response-card {
+            transition: all 0.3s ease;
+        }
+        
+        .response-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans">
@@ -73,7 +82,7 @@
                         <i class="fas fa-graduation-cap text-white text-2xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-3xl font-bold text-white">Automação Escolar</h1>
+                        <h1 class="text-3xl font-bold text-white">Projeto Mãe Coruja</h1>
                         <p class="text-white text-opacity-90">Gestão inteligente para instituições de ensino</p>
                     </div>
                 </div>
@@ -145,7 +154,7 @@
                 <!-- Survey Responses Card -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
                     <div class="p-6">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Respostas da Pesquisa</h2>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Pesquisa Quantitativa (0-5)</h2>
                         
                         <div class="mb-4">
                             <label for="surveySelect" class="block text-sm font-medium text-gray-700 mb-1">Selecione a Pesquisa</label>
@@ -202,6 +211,49 @@
                             <div id="noResponsesMessage" class="text-center py-8 text-gray-500">
                                 <i class="fas fa-comment-slash text-3xl mb-2"></i>
                                 <p>Selecione uma pesquisa para ver as respostas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Qualitative Survey Responses Card -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Pesquisa Qualitativa (Respostas)</h2>
+                        
+                        <div class="mb-4">
+                            <label for="qualitativeSurveySelect" class="block text-sm font-medium text-gray-700 mb-1">Selecione a Pesquisa</label>
+                            <select id="qualitativeSurveySelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                                <option value="" disabled selected>Carregando pesquisas...</option>
+                            </select>
+                        </div>
+
+                        <div class="relative">
+                            <div id="qualitativeResponsesLoading" class="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center hidden">
+                                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
+                            </div>
+
+                            <div id="qualitativeResponsesContainer" class="hidden">
+                                <h3 class="font-medium text-gray-900 mb-4 text-center" id="qualitativeSurveyQuestionText"></h3>
+                                
+                                <!-- Stats -->
+                                <div class="bg-primary-50 p-3 rounded-lg text-center mb-6">
+                                    <div class="text-2xl font-bold text-primary-600" id="totalQualitativeResponses">0</div>
+                                    <div class="text-sm text-gray-600">Total de respostas</div>
+                                </div>
+                                
+                                <!-- Responses List -->
+                                <div class="mt-4 space-y-4">
+                                    <h4 class="font-medium text-gray-900 mb-2">Respostas recebidas:</h4>
+                                    <div id="qualitativeResponsesList" class="space-y-3">
+                                        <!-- Responses will be inserted here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="noQualitativeResponsesMessage" class="text-center py-8 text-gray-500">
+                                <i class="fas fa-comment-slash text-3xl mb-2"></i>
+                                <p>Selecione uma pesquisa para ver as respostas qualitativas.</p>
                             </div>
                         </div>
                     </div>
@@ -278,10 +330,10 @@
                     </div>
                 </div>
 
-                <!-- Add Survey Card -->
+                <!-- Add Quantitative Survey Card -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
                     <div class="p-6">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Enviar Pesquisa</h2>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Enviar Pesquisa Quantitativa (0-5)</h2>
                         
                         <form id="addSurveyForm" class="space-y-4">
                             <div>
@@ -296,6 +348,57 @@
                             
                             <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
                                 <i class="fas fa-paper-plane mr-2"></i> Enviar Pesquisa
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Add Qualitative Survey Card -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Enviar Pesquisa Qualitativa</h2>
+                        
+                        <form id="addQualitativeSurveyForm" class="space-y-4">
+                            <div>
+                                <label for="qualitativeSurveyQuestion" class="block text-sm font-medium text-gray-700 mb-1">Pergunta da Pesquisa</label>
+                                <textarea id="qualitativeSurveyQuestion" name="qualitativeSurveyQuestion" rows="3" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300" placeholder="Descreva sua experiência com nossa escola..."></textarea>
+                            </div>
+                            
+                            <div>
+                                <label for="qualitativeSurveyDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Envio</label>
+                                <input type="date" id="qualitativeSurveyDate" name="qualitativeSurveyDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                                <i class="fas fa-paper-plane mr-2"></i> Enviar Pesquisa Qualitativa
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Add Notice Card -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Inserir Informativo</h2>
+                        
+                        <form id="addNoticeForm" class="space-y-4">
+                            <div>
+                                <label for="noticeTitle" class="block text-sm font-medium text-gray-700 mb-1">Título do Informativo</label>
+                                <input type="text" id="noticeTitle" name="noticeTitle" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                            </div>
+                            
+                            <div>
+                                <label for="noticeContent" class="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>
+                                <textarea id="noticeContent" name="noticeContent" rows="3" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label for="noticeDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Publicação</label>
+                                <input type="date" id="noticeDate" name="noticeDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300">
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                                <i class="fas fa-bullhorn mr-2"></i> Publicar Informativo
                             </button>
                         </form>
                     </div>
@@ -321,6 +424,8 @@
         const addStudentForm = document.getElementById('addStudentForm');
         const addGradeForm = document.getElementById('addGradeForm');
         const addSurveyForm = document.getElementById('addSurveyForm');
+        const addQualitativeSurveyForm = document.getElementById('addQualitativeSurveyForm');
+        const addNoticeForm = document.getElementById('addNoticeForm');
         const surveySelect = document.getElementById('surveySelect');
         const responsesContainer = document.getElementById('responsesContainer');
         const noResponsesMessage = document.getElementById('noResponsesMessage');
@@ -331,6 +436,15 @@
         const responsesTableBody = document.getElementById('responsesTableBody');
         const notificationArea = document.getElementById('notificationArea');
         
+        // Qualitative Surveys Elements
+        const qualitativeSurveySelect = document.getElementById('qualitativeSurveySelect');
+        const qualitativeResponsesContainer = document.getElementById('qualitativeResponsesContainer');
+        const noQualitativeResponsesMessage = document.getElementById('noQualitativeResponsesMessage');
+        const qualitativeResponsesLoading = document.getElementById('qualitativeResponsesLoading');
+        const qualitativeSurveyQuestionText = document.getElementById('qualitativeSurveyQuestionText');
+        const totalQualitativeResponses = document.getElementById('totalQualitativeResponses');
+        const qualitativeResponsesList = document.getElementById('qualitativeResponsesList');
+        
         // Chart instance
         let responsesChart = null;
         
@@ -338,6 +452,8 @@
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('gradeDate').value = today;
         document.getElementById('surveyDate').value = today;
+        document.getElementById('qualitativeSurveyDate').value = today;
+        document.getElementById('noticeDate').value = today;
         
         // Show notification function
         function showNotification(message, type = 'success') {
@@ -478,6 +594,9 @@
         // Load surveys from API
         async function loadSurveys() {
             try {
+                surveySelect.disabled = true;
+                surveySelect.innerHTML = '<option value="">Carregando pesquisas...</option>';
+                
                 const response = await fetch(`${API_BASE_URL}/lista/pesquisas`);
                 const surveys = await response.json();
                 
@@ -491,17 +610,56 @@
                         surveySelect.appendChild(option);
                     });
                 } else {
-                    surveySelect.innerHTML = '<option value="" disabled selected>Nenhuma pesquisa disponível</option>';
+                    surveySelect.innerHTML = '<option value="" disabled>Nenhuma pesquisa disponível</option>';
                 }
             } catch (error) {
                 console.error('Error loading surveys:', error);
+                surveySelect.innerHTML = '<option value="" disabled>Erro ao carregar</option>';
                 showNotification('Erro ao carregar pesquisas. Tente novamente.', 'error');
+            } finally {
+                surveySelect.disabled = false;
+            }
+        }
+        
+        // Load qualitative surveys from API
+        async function loadQualitativeSurveys() {
+            try {
+                qualitativeSurveySelect.disabled = true;
+                qualitativeSurveySelect.innerHTML = '<option value="">Carregando pesquisas...</option>';
+                
+                const response = await fetch(`${API_BASE_URL}/listar/pesquisas_qualitativas`);
+                const surveys = await response.json();
+                
+                qualitativeSurveySelect.innerHTML = '<option value="" disabled selected>Selecione uma pesquisa</option>';
+                
+                if (surveys.length > 0) {
+                    surveys.forEach(survey => {
+                        const option = document.createElement('option');
+                        option.value = survey.id;
+                        option.textContent = `${survey.pergunta} (${survey.data_envio})`;
+                        qualitativeSurveySelect.appendChild(option);
+                    });
+                } else {
+                    qualitativeSurveySelect.innerHTML = '<option value="" disabled>Nenhuma pesquisa qualitativa disponível</option>';
+                }
+            } catch (error) {
+                console.error('Error loading qualitative surveys:', error);
+                qualitativeSurveySelect.innerHTML = '<option value="" disabled>Erro ao carregar</option>';
+                showNotification('Erro ao carregar pesquisas qualitativas. Tente novamente.', 'error');
+            } finally {
+                qualitativeSurveySelect.disabled = false;
             }
         }
         
         // Load survey responses from API
         async function loadSurveyResponses(surveyId) {
             try {
+                // Resetar visualizações anteriores
+                if (responsesChart) {
+                    responsesChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0];
+                    responsesChart.update();
+                }
+                
                 responsesLoading.classList.remove('hidden');
                 noResponsesMessage.classList.add('hidden');
                 responsesContainer.classList.add('hidden');
@@ -509,42 +667,9 @@
                 const response = await fetch(`${API_BASE_URL}/lista/respostas?pesquisa_id=${surveyId}`);
                 const responses = await response.json();
                 
-                if (responses.length > 0) {
-                    // Update question text
-                    const selectedSurvey = surveySelect.options[surveySelect.selectedIndex].text;
-                    surveyQuestionText.textContent = selectedSurvey.split('(')[0].trim();
-                    
-                    // Calculate stats
-                    const total = responses.length;
-                    const sum = responses.reduce((acc, curr) => acc + parseInt(curr.resposta), 0);
-                    const average = (sum / total).toFixed(1);
-                    
-                    // Update stats
-                    totalResponses.textContent = total;
-                    averageRating.textContent = average;
-                    
-                    // Update chart
-                    updateChart(responses);
-                    
-                    // Update responses table
-                    responsesTableBody.innerHTML = '';
-                    const latestResponses = responses.slice(0, 10); // Show last 10 responses
-                    latestResponses.forEach(response => {
-                        const row = document.createElement('tr');
-                        row.className = 'hover:bg-gray-50';
-                        row.innerHTML = `
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                                ${response.aluno_id}
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${getRatingColor(response.resposta)}">
-                                ${response.resposta} ★
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                                ${new Date(response.data_resposta).toLocaleDateString()}
-                            </td>
-                        `;
-                        responsesTableBody.appendChild(row);
-                    });
+                if (responses && responses.length > 0) {
+                    // Atualizar UI com dados
+                    updateSurveyUI(responses);
                     
                     responsesContainer.classList.remove('hidden');
                 } else {
@@ -560,6 +685,103 @@
             } finally {
                 responsesLoading.classList.add('hidden');
             }
+        }
+        
+        // Load qualitative survey responses from API
+        async function loadQualitativeSurveyResponses(surveyId) {
+            try {
+                qualitativeResponsesLoading.classList.remove('hidden');
+                noQualitativeResponsesMessage.classList.add('hidden');
+                qualitativeResponsesContainer.classList.add('hidden');
+                
+                const response = await fetch(`${API_BASE_URL}/listar/respostas_qualitativas?pesquisa_id=${surveyId}`);
+                const responses = await response.json();
+                
+                if (responses && responses.length > 0) {
+                    // Atualizar UI com dados
+                    updateQualitativeSurveyUI(responses);
+                    
+                    qualitativeResponsesContainer.classList.remove('hidden');
+                } else {
+                    noQualitativeResponsesMessage.classList.remove('hidden');
+                    noQualitativeResponsesMessage.innerHTML = `
+                        <i class="fas fa-comment-slash text-3xl mb-2"></i>
+                        <p>Nenhuma resposta qualitativa encontrada para esta pesquisa.</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading qualitative survey responses:', error);
+                showNotification('Erro ao carregar respostas qualitativas. Tente novamente.', 'error');
+            } finally {
+                qualitativeResponsesLoading.classList.add('hidden');
+            }
+        }
+        
+        // Update survey UI with response data
+        function updateSurveyUI(responses) {
+            const selectedSurvey = surveySelect.options[surveySelect.selectedIndex].text;
+            surveyQuestionText.textContent = selectedSurvey.split('(')[0].trim();
+            
+            const total = responses.length;
+            const sum = responses.reduce((acc, curr) => acc + parseInt(curr.resposta), 0);
+            const average = (sum / total).toFixed(1);
+            
+            totalResponses.textContent = total;
+            averageRating.textContent = average;
+            
+            updateChart(responses);
+            updateResponsesTable(responses.slice(0, 10));
+        }
+        
+        // Update qualitative survey UI with response data
+        function updateQualitativeSurveyUI(responses) {
+            const selectedSurvey = qualitativeSurveySelect.options[qualitativeSurveySelect.selectedIndex].text;
+            qualitativeSurveyQuestionText.textContent = selectedSurvey.split('(')[0].trim();
+            
+            const total = responses.length;
+            totalQualitativeResponses.textContent = total;
+            
+            updateQualitativeResponsesList(responses);
+        }
+        
+        // Update responses table
+        function updateResponsesTable(responses) {
+            responsesTableBody.innerHTML = '';
+            
+            responses.forEach(response => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        ${response.aluno_id}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${getRatingColor(response.resposta)}">
+                        ${response.resposta} ★
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        ${new Date(response.data_resposta).toLocaleDateString()}
+                    </td>
+                `;
+                responsesTableBody.appendChild(row);
+            });
+        }
+        
+        // Update qualitative responses list
+        function updateQualitativeResponsesList(responses) {
+            qualitativeResponsesList.innerHTML = '';
+            
+            responses.forEach(response => {
+                const responseCard = document.createElement('div');
+                responseCard.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200 response-card';
+                responseCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-sm font-medium text-gray-700">Aluno ID: ${response.aluno_id}</span>
+                        <span class="text-xs text-gray-500">${new Date(response.data_resposta).toLocaleDateString()}</span>
+                    </div>
+                    <div class="text-gray-800 whitespace-pre-line">${response.resposta}</div>
+                `;
+                qualitativeResponsesList.appendChild(responseCard);
+            });
         }
         
         // Get color based on rating
@@ -632,7 +854,7 @@
             }
         }
 
-        // Add survey
+        // Add quantitative survey
         async function addSurvey(surveyData) {
             try {
                 const response = await fetch(`${API_BASE_URL}/inserir/pesquisa`, {
@@ -647,7 +869,7 @@
                 });
                 
                 const result = await response.json();
-                showNotification(result.Resposta || 'Pesquisa enviada com sucesso!');
+                showNotification(result.Resposta || 'Pesquisa quantitativa enviada com sucesso!');
                 
                 // Clear form and reload surveys
                 addSurveyForm.reset();
@@ -655,7 +877,61 @@
                 loadSurveys();
             } catch (error) {
                 console.error('Error adding survey:', error);
-                showNotification('Erro ao enviar pesquisa. Tente novamente.', 'error');
+                showNotification('Erro ao enviar pesquisa quantitativa. Tente novamente.', 'error');
+            }
+        }
+
+        // Add qualitative survey
+        async function addQualitativeSurvey(surveyData) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/inserir/pesquisa2`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pergunta: surveyData.qualitativeSurveyQuestion,
+                        data_envio: surveyData.qualitativeSurveyDate
+                    })
+                });
+                
+                const result = await response.json();
+                showNotification(result.Resposta || 'Pesquisa qualitativa enviada com sucesso!');
+                
+                // Clear form and reload qualitative surveys
+                addQualitativeSurveyForm.reset();
+                document.getElementById('qualitativeSurveyDate').value = today;
+                loadQualitativeSurveys();
+            } catch (error) {
+                console.error('Error adding qualitative survey:', error);
+                showNotification('Erro ao enviar pesquisa qualitativa. Tente novamente.', 'error');
+            }
+        }
+
+        // Add notice
+        async function addNotice(noticeData) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/inserir/informativo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        titulo: noticeData.noticeTitle,
+                        conteudo: noticeData.noticeContent,
+                        data_publicacao: noticeData.noticeDate
+                    })
+                });
+                
+                const result = await response.json();
+                showNotification(result.Resposta || 'Informativo publicado com sucesso!');
+                
+                // Clear form
+                addNoticeForm.reset();
+                document.getElementById('noticeDate').value = today;
+            } catch (error) {
+                console.error('Error adding notice:', error);
+                showNotification('Erro ao publicar informativo. Tente novamente.', 'error');
             }
         }
         
@@ -735,20 +1011,72 @@
             });
         });
 
+        addQualitativeSurveyForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const qualitativeSurveyQuestion = document.getElementById('qualitativeSurveyQuestion').value.trim();
+            const qualitativeSurveyDate = document.getElementById('qualitativeSurveyDate').value;
+            
+            if (!qualitativeSurveyQuestion || !qualitativeSurveyDate) {
+                showNotification('Preencha todos os campos obrigatórios.', 'error');
+                return;
+            }
+            
+            addQualitativeSurvey({
+                qualitativeSurveyQuestion,
+                qualitativeSurveyDate
+            });
+        });
+
+        addNoticeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const noticeTitle = document.getElementById('noticeTitle').value.trim();
+            const noticeContent = document.getElementById('noticeContent').value.trim();
+            const noticeDate = document.getElementById('noticeDate').value;
+            
+            if (!noticeTitle || !noticeContent || !noticeDate) {
+                showNotification('Preencha todos os campos obrigatórios.', 'error');
+                return;
+            }
+            
+            addNotice({
+                noticeTitle,
+                noticeContent,
+                noticeDate
+            });
+        });
+
         surveySelect.addEventListener('change', (e) => {
             if (e.target.value) {
                 loadSurveyResponses(e.target.value);
             } else {
                 noResponsesMessage.classList.remove('hidden');
                 responsesContainer.classList.add('hidden');
+                
+                // Reset chart
+                if (responsesChart) {
+                    responsesChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0];
+                    responsesChart.update();
+                }
             }
         });
         
-        // Initialize chart on load
+        qualitativeSurveySelect.addEventListener('change', (e) => {
+            if (e.target.value) {
+                loadQualitativeSurveyResponses(e.target.value);
+            } else {
+                noQualitativeResponsesMessage.classList.remove('hidden');
+                qualitativeResponsesContainer.classList.add('hidden');
+            }
+        });
+        
+        // Initialize chart and load data on page load
         document.addEventListener('DOMContentLoaded', () => {
             initChart();
             loadStudents();
             loadSurveys();
+            loadQualitativeSurveys();
         });
     </script>
 </body>
