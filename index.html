@@ -148,6 +148,11 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Botão Envia Boletim -->
+                        <button id="sendReportCardBtn" class="mt-4 w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                            <i class="fas fa-file-alt mr-2"></i> Envia Boletim
+                        </button>
                     </div>
                 </div>
 
@@ -350,6 +355,11 @@
                                 <i class="fas fa-paper-plane mr-2"></i> Enviar Pesquisa
                             </button>
                         </form>
+
+                        <!-- Botão Envia Pesquisa Quantitativa -->
+                        <button id="sendQuantitativeSurveyBtn" class="mt-4 w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                            <i class="fas fa-paper-plane mr-2"></i> Envia Pesquisa Quantitativa
+                        </button>
                     </div>
                 </div>
 
@@ -373,6 +383,11 @@
                                 <i class="fas fa-paper-plane mr-2"></i> Enviar Pesquisa Qualitativa
                             </button>
                         </form>
+
+                        <!-- Botão Envia Pesquisa Qualitativa -->
+                        <button id="sendQualitativeSurveyBtn" class="mt-4 w-full bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center">
+                            <i class="fas fa-paper-plane mr-2"></i> Envia Pesquisa Qualitativa
+                        </button>
                     </div>
                 </div>
 
@@ -444,6 +459,11 @@
         const qualitativeSurveyQuestionText = document.getElementById('qualitativeSurveyQuestionText');
         const totalQualitativeResponses = document.getElementById('totalQualitativeResponses');
         const qualitativeResponsesList = document.getElementById('qualitativeResponsesList');
+        
+        // New Buttons
+        const sendReportCardBtn = document.getElementById('sendReportCardBtn');
+        const sendQuantitativeSurveyBtn = document.getElementById('sendQuantitativeSurveyBtn');
+        const sendQualitativeSurveyBtn = document.getElementById('sendQualitativeSurveyBtn');
         
         // Chart instance
         let responsesChart = null;
@@ -934,6 +954,57 @@
                 showNotification('Erro ao publicar informativo. Tente novamente.', 'error');
             }
         }
+
+        // Send report card
+        async function sendReportCard() {
+            try {
+                sendReportCardBtn.disabled = true;
+                const response = await fetch('https://n8n.2bx.com.br/webhook/envia/boletim', {
+                    method: 'GET'
+                });
+                const result = await response.json();
+                showNotification(result.Resposta || 'Boletins enviados com sucesso!');
+            } catch (error) {
+                console.error('Error sending report cards:', error);
+                showNotification('Erro ao enviar boletins. Tente novamente.', 'error');
+            } finally {
+                sendReportCardBtn.disabled = false;
+            }
+        }
+
+        // Send quantitative survey
+        async function sendQuantitativeSurvey() {
+            try {
+                sendQuantitativeSurveyBtn.disabled = true;
+                const response = await fetch('https://n8n.2bx.com.br/webhook/envia/pesquisa_quantitativa', {
+                    method: 'GET'
+                });
+                const result = await response.json();
+                showNotification(result.Resposta || 'Pesquisa quantitativa enviada com sucesso!');
+            } catch (error) {
+                console.error('Error sending quantitative survey:', error);
+                showNotification('Erro ao enviar pesquisa quantitativa. Tente novamente.', 'error');
+            } finally {
+                sendQuantitativeSurveyBtn.disabled = false;
+            }
+        }
+
+        // Send qualitative survey
+        async function sendQualitativeSurvey() {
+            try {
+                sendQualitativeSurveyBtn.disabled = true;
+                const response = await fetch('https://n8n.2bx.com.br/webhook/envia/pesquisa_qualitativa', {
+                    method: 'GET'
+                });
+                const result = await response.json();
+                showNotification(result.Resposta || 'Pesquisa qualitativa enviada com sucesso!');
+            } catch (error) {
+                console.error('Error sending qualitative survey:', error);
+                showNotification('Erro ao enviar pesquisa qualitativa. Tente novamente.', 'error');
+            } finally {
+                sendQualitativeSurveyBtn.disabled = false;
+            }
+        }
         
         // Event Listeners
         listStudentsBtn.addEventListener('click', loadStudents);
@@ -1070,6 +1141,11 @@
                 qualitativeResponsesContainer.classList.add('hidden');
             }
         });
+
+        // Event Listeners para os novos botões
+        sendReportCardBtn.addEventListener('click', sendReportCard);
+        sendQuantitativeSurveyBtn.addEventListener('click', sendQuantitativeSurvey);
+        sendQualitativeSurveyBtn.addEventListener('click', sendQualitativeSurvey);
         
         // Initialize chart and load data on page load
         document.addEventListener('DOMContentLoaded', () => {
